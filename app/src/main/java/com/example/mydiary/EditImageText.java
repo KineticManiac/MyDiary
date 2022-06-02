@@ -87,6 +87,10 @@ public class EditImageText extends AppCompatEditText {
                     }
                     finally {
                         try{
+                            if(is == null) {
+                                new NullPointerException().printStackTrace(); //Bu işe yarar mı acaba?
+                                return false;
+                            }
                             is.close();
                         }
                         catch (Exception e){
