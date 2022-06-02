@@ -1,13 +1,10 @@
 package com.example.mydiary;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
-import android.text.SpannableString;
-import android.text.Spanned;
 import android.text.style.ImageSpan;
 import android.widget.EditText;
-import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -16,14 +13,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        EditText et = findViewById(R.id.editTextTextMultiLine);
-        TextView tv = findViewById(R.id.textView);
+        EditText et = findViewById(R.id.editTextTextMultiLine4);
+        et.setText("Hello  World! Hi  Mom!");
 
-        SpannableString string = new SpannableString("Hello world!");
-        string.setSpan(new ImageSpan(this, R.drawable.icon),
-                0, 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        ImageSpan imageSpan1 = new ImageSpan(this, R.drawable.icon);
+        ImageSpan imageSpan2 = new ImageSpan(this, R.drawable.icon);
 
-        et.setText(string, TextView.BufferType.SPANNABLE);
-        tv.setText(string, TextView.BufferType.SPANNABLE);
+        ImageAttacher.attach(et, imageSpan1, 6);
+        ImageAttacher.attach(et, imageSpan2, 18);
     }
 }
