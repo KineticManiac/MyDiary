@@ -11,8 +11,11 @@ import android.text.style.ImageSpan;
 import com.example.mydiary.register.Registry;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,13 +34,19 @@ public class ContentRegisterer {
     }
 
     public Spanned load(String contentName) throws IOException {
-        SpannableString text = new SpannableString(new String(
+        String text = new String(
                 registry.getInputStream(getTextRegister(contentName)).readAll(),
                 StandardCharsets.UTF_8
-        ));
+        );
+        class Image{
+            Bitmap bmp;
+            int pos;
+        }
+        ArrayList<Image> images = new ArrayList<>();
 
         StringBuffer buffer = new StringBuffer();
         Matcher matcher = Pattern.compile("<\\w*>").matcher(text);
+        int lastEnd = 0;
         while(matcher.find()){
             String str = matcher.group();
             if(str.equals("<lt>")){
@@ -50,34 +59,72 @@ public class ContentRegisterer {
                 String suffix = "." + str.substring(1, str.length() - 1);
                 String rName = contentName + suffix;
 
+                InputStream is = registry.getInputStream(rName);
+                Bitmap bmp = BitmapFactory.decodeStream(is);
+                is.close();
+
+                Image image = new Image();
+                image.bmp = bmp;
+                image.pos = buffer.length() + matcher.start() - lastEnd;
+
+                images.add(image);
+
                 matcher.appendReplacement(buffer, "@");
-
-                Bitmap bmp = BitmapFactory.decodeStream(registry.getInputStream(rName));
-
-                text.setSpan(new ImageSpan(context, bmp), matcher.start(), matcher.end(),
-                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
+            lastEnd = matcher.end();
         }
         matcher.appendTail(buffer);
-        return text;
+
+        SpannableString content = new SpannableString(buffer);
+        for(Image image: images){
+            content.setSpan(new ImageSpan(context, image.bmp), image.pos, image.pos + 1,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+
+        return content;
     }
 
     public void store(String contentName, Spanned spanned) throws IOException{
-        String text = spanned.toString();
 
-        text = text.replaceAll("<", "<lt>").replaceAll(">", "<gt>");
+        HashMap<Integer, String> images = new HashMap<>();
 
         int i = 0;
         for (ImageSpan is : spanned.getSpans(0, spanned.length(), ImageSpan.class)) {
             Bitmap bmp = ((BitmapDrawable) is.getDrawable()).getBitmap(); //Çirkin bir kod :(
-            bmp.compress(Bitmap.CompressFormat.PNG, 100, registry.getOutputStream(contentName + "." + i));
 
-            text = text.substring(0, spanned.getSpanStart(is)) + "<" + i + ">" + text.substring(spanned.getSpanEnd(is));
+            OutputStream os = registry.getOutputStream(contentName + "." + i);
+            bmp.compress(Bitmap.CompressFormat.PNG, 100, os);
+            os.close();
+
+            images.put(spanned.getSpanStart(is), String.valueOf(i));
 
             i++;
         }
 
-        byte[] bytes = text.getBytes(StandardCharsets.UTF_8);
+        StringBuffer buffer = new StringBuffer();
+        Matcher matcher = Pattern.compile("[<>@]").matcher(spanned);
+        while(matcher.find()){
+            String str = matcher.group();
+            if(str.equals("<")){
+                matcher.appendReplacement(buffer, "<lt>");
+            }
+            else if(str.equals(">")){
+                matcher.appendReplacement(buffer, "<gt>");
+            }
+            else if(str.equals("@")){
+                String id = images.get(matcher.start());
+                if(id != null){
+                    matcher.appendReplacement(buffer, "<" + id + ">");
+                }
+            }
+            else{
+                //Yukarının bütün ihtimalleri içermesi gerekir.
+                throw new RuntimeException("Unreachable code!");
+            }
+        }
+        matcher.appendTail(buffer);
+
+        byte[] bytes = buffer.toString().getBytes(StandardCharsets.UTF_8);
         OutputStream os = registry.getOutputStream(getTextRegister(contentName));
         os.write(bytes);
         os.close();

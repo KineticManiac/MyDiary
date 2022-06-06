@@ -2,7 +2,9 @@ package com.example.mydiary.data;
 
 import androidx.annotation.NonNull;
 
-public enum Mood {
+import java.io.Serializable;
+
+public enum Mood implements Serializable {
     NEUTRAL("\uD83D\uDE10"),
     HAPPY("\uD83D\uDE42"),
     ECSTATIC("\uD83D\uDE01"),

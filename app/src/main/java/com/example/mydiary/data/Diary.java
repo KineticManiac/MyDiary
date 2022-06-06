@@ -16,62 +16,171 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.UUID;
 
-public class Diary{
-    public static Spanned EMPTY_CONTENT = new SpannedString("");
+public class Diary implements Iterable<Diary.ViewPage> {
+    public static final Page EMPTY_PAGE = new Page() {
+        @Override
+        public String getTitle() {
+            return "My Diary Page";
+        }
+
+        @Override
+        public Mood getMood() {
+            return Mood.DEFAULT;
+        }
+
+        @Override
+        public Spanned getContent() {
+            return new SpannedString("");
+        }
+    };
     private final DiaryPageSet diaryPageSet;
+    private final Context context;
     private final Registry registry;
+    private final ContentRegisterer contentRegisterer;
     private final String registerName;
-    private final DiaryPageSetFactory diaryPageSetFactory;
+    private final DiaryPageSetRegisterer diaryPageSetRegisterer;
 
-    public Diary(Registry registry, String registerName) throws IOException{
+    public Diary(Context context, Registry registry, String registerName) throws IOException{
+        this.context = context;
         this.registry = registry;
+        this.contentRegisterer = new ContentRegisterer(context, registry);
         this.registerName = registerName;
-        this.diaryPageSetFactory = new DiaryPageSetFactory();
-        this.diaryPageSet = diaryPageSetFactory.loadOrCreate(registerName);
+        this.diaryPageSetRegisterer = new DiaryPageSetRegisterer();
+        this.diaryPageSet = diaryPageSetRegisterer.loadOrCreate(registerName);
     }
 
-    public static class TitleAlreadyExistsException extends Exception{ }
+    public ViewPage viewPageById(String pageId){
+        return new ViewPage(diaryPageSet.getById(pageId));
+    }
 
-    private class DiaryPageSetFactory {
+    public ViewPage viewPageByTitle(String title){
+        return new ViewPage(diaryPageSet.getByTitle(title));
+    }
+
+    public EditPage editPage(Page page) throws IOException {
+        return new EditPage(page);
+    }
+
+    public EditPage editPageById(String pageId) throws IOException {
+        return new EditPage(diaryPageSet.getById(pageId));
+    }
+
+    public EditPage editPageByTitle(String title) throws IOException {
+        return new EditPage(diaryPageSet.getByTitle(title));
+    }
+
+    public EditPage editEmptyPage(){
+        try {
+            return new EditPage(EMPTY_PAGE);
+        }
+        catch (IOException e){
+            throw new RuntimeException(e); //Burada oluşmaması beklenir
+        }
+    }
+
+    public void storePage(String pageId, Page page) throws IOException{
+        diaryPageSet.put(pageId, page);
+        diaryPageSetRegisterer.storeSet(registerName, diaryPageSet);
+    }
+
+    public String createPageId(){
+        return UUID.randomUUID().toString();
+    }
+
+    public OpenPage createPage(){
+        return new OpenPage(createPageId(), editEmptyPage());
+    }
+
+    public OpenPage openPage(ViewPage page) throws IOException{
+        return new OpenPage(page.getId(), editPage(page));
+    }
+
+    public OpenPage openPageById(String pageId) throws IOException{
+        return new OpenPage(pageId, editPageById(pageId));
+    }
+
+    public OpenPage openPageByTitle(String title) throws IOException{
+        return openPage(viewPageByTitle(title));
+    }
+
+
+    @NonNull
+    @Override
+    public Iterator<ViewPage> iterator() {
+        final Iterator<DiaryPage> iterator = diaryPageSet.iterator();
+        return new Iterator<ViewPage>() {
+            @Override
+            public boolean hasNext() {
+                return iterator().hasNext();
+            }
+
+            @Override
+            public ViewPage next() {
+                return new ViewPage(iterator.next());
+            }
+        };
+    }
+
+    public static class TitleAlreadyExistsException extends Exception{
+        public TitleAlreadyExistsException(){
+            super();
+        }
+        public TitleAlreadyExistsException(String description){
+            super(description);
+        }
+    }
+
+    private class DiaryPageSetRegisterer {
         DiaryPageSet loadOrCreate(String rName) throws IOException{
-            DiaryPageSet set = storeSet(rName);
+            DiaryPageSet set = loadSet(rName);
             return set != null ? set : new DiaryPageSet();
         }
 
-        void loadSet(String rName, DiaryPageSet set) throws IOException {
+        void storeSet(String rName, DiaryPageSet set) throws IOException {
             ObjectOutputStream oos = new ObjectOutputStream(registry.getOutputStream(rName));
-            oos.writeObject(set);
+            oos.writeObject(set.idMap);
             oos.close();
         }
 
-        DiaryPageSet storeSet(String rName) throws IOException {
+        DiaryPageSet loadSet(String rName) throws IOException {
             InputStream is = registry.getInputStream(rName);
             if(is == null){
                 return null;
             }
             ObjectInputStream ois = new ObjectInputStream(is);
-            DiaryPageSet map;
+            HashMap<String, DiaryPage> map;
             try {
-                map = (DiaryPageSet) ois.readObject();
+                map = (HashMap<String, DiaryPage>) ois.readObject();
             }
             catch (ClassNotFoundException e){
                 throw new RuntimeException(e); //Bu hiçbir zaman olmamalı
             }
             ois.close();
-            return map;
+            return new DiaryPageSet(map);
         }
     }
 
-    private class DiaryPageSet implements Serializable, Iterable<DiaryPage>{
+    private class DiaryPageSet implements Iterable<DiaryPage>{
         final HashMap<String, DiaryPage> idMap;
         final HashMap<String, DiaryPage> titleMap;
 
-        void put(DiaryPage diaryPage) throws TitleAlreadyExistsException{
-            if(!diaryPage.pageId.equals(getByTitle(diaryPage.title).pageId))
-                throw new TitleAlreadyExistsException();
-            titleMap.put(diaryPage.title, diaryPage);
-            idMap.put(diaryPage.pageId, diaryPage);
+        void put(String pageId, Page source) throws IOException{
+            String title = source.getTitle();
+            DiaryPage destination = getById(pageId);
+            if(destination != null){
+                if(!title.equals(destination.title)){
+                    titleMap.remove(destination.title);
+                    titleMap.put(title, destination);
+                }
+                destination.copyFrom(source);
+            }
+            else{
+                destination = new DiaryPage(Diary.this, pageId, source);
+                idMap.put(pageId, destination);
+                titleMap.put(title, destination);
+            }
         }
 
         DiaryPage getById(String pageId){
@@ -83,6 +192,7 @@ public class Diary{
             return idMap.containsKey(diaryPage.pageId);
         }
         boolean hasTitle(String title) { return titleMap.containsKey(title); }
+        boolean hasId(String pageId) { return idMap.containsKey(pageId); }
 
         Collection<DiaryPage> values(){
             return idMap.values();
@@ -93,20 +203,56 @@ public class Diary{
             titleMap = new HashMap<>();
         }
 
+        DiaryPageSet(HashMap<String, DiaryPage> idMap){
+            this.idMap = idMap;
+            titleMap = new HashMap<>();
+            for(DiaryPage page : idMap.values()){
+                page.diary = Diary.this;
+                titleMap.put(page.title, page);
+            }
+        }
+
         @NonNull
         @Override
         public Iterator<DiaryPage> iterator() {
             return values().iterator();
         }
     }
+
+    public interface Page {
+        String getTitle();
+        Mood getMood();
+        Spanned getContent() throws IOException;
+    }
+
+    public interface ModifiablePage extends Page{
+        void setTitle(String string) throws TitleAlreadyExistsException;
+        void setMood(Mood mood);
+        void setContent(Spanned content) throws IOException;
+    }
+
     //Sadece Diary'de kullanmak için
-    private class DiaryPage implements Serializable {
+    private static class DiaryPage implements Serializable, ModifiablePage {
+        private transient Diary diary;
         private final String pageId;
         private String title;
         private Mood mood;
 
-        private DiaryPage(String pageId){
+        private DiaryPage(Diary diary, String pageId, Page page) throws IOException{
+            this.diary = diary;
+
+            assert !diary.diaryPageSet.hasId(pageId);
+
             this.pageId = pageId;
+            copyFrom(page);
+        }
+
+        private void copyFrom(Page page) throws IOException{
+            String pageTitle = page.getTitle();
+            if(title == null || !title.equals(pageTitle))
+                title = pageTitle;
+            setMood(page.getMood());
+            setContent(page.getContent());
         }
 
         public String getTitle() {
@@ -117,36 +263,38 @@ public class Diary{
             return mood;
         }
 
-        public Spanned getContent(Context context, Registry registry) throws IOException {
-            return new ContentRegisterer(context, registry).load(pageId);
+        String getId(){
+            return pageId;
         }
 
-        public boolean setTitle(String title) {
-            for(DiaryPage page : diaryPageSet.values()){
-                if(page.title.equals(title))
-                    return false;
-            }
+        public Spanned getContent() throws IOException {
+            return new ContentRegisterer(diary.context, diary.registry).load(pageId);
+        }
+
+        public void setTitle(String title) throws TitleAlreadyExistsException{
+            if(diary.diaryPageSet.hasTitle(title))
+                throw new TitleAlreadyExistsException("Title " + title + " already exists.");
             this.title = title;
-            return true;
         }
 
         public void setMood(Mood mood) {
             this.mood = mood;
         }
 
-        public void setContent(Context context, Registry registry, Spanned content) throws IOException {
-            new ContentRegisterer(context, registry).store(pageId, content);
+        public void setContent(Spanned content) throws IOException {
+            diary.contentRegisterer.store(pageId, content);
         }
     }
 
     //Diary'deki DiaryPage'leri izlemek için
-
-    public class ViewPage{
+    public static class ViewPage implements Page{
         private final DiaryPage page;
 
         private ViewPage(DiaryPage page){
             this.page = page;
         }
+
+        public String getId() { return page.getId(); }
 
         public String getTitle() {
             return page.getTitle();
@@ -156,27 +304,21 @@ public class Diary{
             return page.getMood();
         }
 
-        public Spanned getContent(Context context, Registry registry) throws IOException {
-            return page.getContent(context, registry);
+        public Spanned getContent() throws IOException {
+            return page.getContent();
         }
     }
 
-    //Page editlemek için (Bitirdikten sonra tekrar geri yüklemek gerekir)
-    public class EditPage{
-        private final String pageId;
+    //Page düzenlemek için (Bitirdikten sonra tekrar geri yüklemek gerekir)
+    public class EditPage implements ModifiablePage {
         private String title;
         private Mood mood;
         private Spanned content;
 
-        private EditPage(Context context, Registry registry, DiaryPage page) throws IOException {
-            this.pageId = page.pageId;
-            this.title = page.title;
-            this.mood = page.mood;
-            this.content = page.getContent(context, registry);
-        }
-
-        private String getPageId(){
-            return pageId;
+        private EditPage(Page page) throws IOException {
+            this.title = page.getTitle();
+            this.mood = page.getMood();
+            this.content = page.getContent();
         }
 
         public String getTitle() {
@@ -191,13 +333,10 @@ public class Diary{
             return content;
         }
 
-        public boolean setTitle(String title) {
-            for(DiaryPage page : diaryPageSet.values()){
-                if(page.title.equals(title))
-                    return false;
-            }
+        public void setTitle(String title) throws TitleAlreadyExistsException{
+            if(diaryPageSet.hasTitle(title))
+                    throw new TitleAlreadyExistsException("Title " + title + " already exists.");
             this.title = title;
-            return true;
         }
 
         public void setMood(Mood mood) {
@@ -206,6 +345,51 @@ public class Diary{
 
         public void setContent(Spanned content) {
             this.content = content;
+        }
+    }
+
+    //Page düzenlemek için (bitirdikten sonra kapatmak gerekir)
+    public class OpenPage implements ModifiablePage{
+        private final EditPage page;
+        private final String pageId;
+
+        private OpenPage(String pageId, EditPage page){
+            this.pageId = pageId;
+            this.page = page;
+        }
+
+        @Override
+        public String getTitle() {
+            return page.getTitle();
+        }
+
+        @Override
+        public Mood getMood() {
+            return page.getMood();
+        }
+
+        @Override
+        public Spanned getContent(){
+            return page.getContent();
+        }
+
+        @Override
+        public void setTitle(String title) throws TitleAlreadyExistsException {
+            page.setTitle(title);
+        }
+
+        @Override
+        public void setMood(Mood mood) {
+            page.setMood(mood);
+        }
+
+        @Override
+        public void setContent(Spanned content) {
+            page.setContent(content);
+        }
+
+        public void close() throws IOException{
+            storePage(pageId, page);
         }
     }
 }
