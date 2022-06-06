@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">MyDiary</string>
+    <string name="action_title_text">Change Title</string>
+    <string name="action_location_set_text">Set Location</string>
+    <string name="action_location_change_text">Change Location</string>
+    <string name="action_date_set_text">Set Date</string>
+    <string name="action_date_change_text">Change Date</string>
 </resources>

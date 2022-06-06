@@ -1,0 +1,23 @@
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_mood"
+        android:title="😐"
+        app:showAsAction="ifRoom"
+        tools:ignore="HardcodedText" />
+
+    <item android:id="@+id/action_title"
+        android:title="@string/action_title_text"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/action_location"
+        android:title="@string/action_location_set_text"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/action_date"
+        android:title="@string/action_date_set_text"
+        app:showAsAction="never"/>
+
+</menu>
