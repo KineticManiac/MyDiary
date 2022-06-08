@@ -105,21 +105,22 @@ public class ContentRegisterer {
         Matcher matcher = Pattern.compile("[<>@]").matcher(spanned);
         while(matcher.find()){
             String str = matcher.group();
-            if(str.equals("<")){
-                matcher.appendReplacement(buffer, "<lt>");
-            }
-            else if(str.equals(">")){
-                matcher.appendReplacement(buffer, "<gt>");
-            }
-            else if(str.equals("@")){
-                String id = images.get(matcher.start());
-                if(id != null){
-                    matcher.appendReplacement(buffer, "<" + id + ">");
-                }
-            }
-            else{
-                //Yukarının bütün ihtimalleri içermesi gerekir.
-                throw new RuntimeException("Unreachable code!");
+            switch (str) {
+                case "<":
+                    matcher.appendReplacement(buffer, "<lt>");
+                    break;
+                case ">":
+                    matcher.appendReplacement(buffer, "<gt>");
+                    break;
+                case "@":
+                    String id = images.get(matcher.start());
+                    if (id != null) {
+                        matcher.appendReplacement(buffer, "<" + id + ">");
+                    }
+                    break;
+                default:
+                    //Yukarının bütün ihtimalleri içermesi gerekir.
+                    throw new RuntimeException("Unreachable code!");
             }
         }
         matcher.appendTail(buffer);

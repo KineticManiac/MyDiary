@@ -27,6 +27,6 @@ public class DiaryRecyclerViewHolder extends RecyclerView.ViewHolder {
     public void loadPage(Page page){
         this.page = page;
 
-        titleTextView.setText(page.getTitle());
+        titleTextView.setText(page.getMood() + " " + page.getTitle());
     }
 }

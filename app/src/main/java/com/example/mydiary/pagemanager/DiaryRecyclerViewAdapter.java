@@ -1,5 +1,6 @@
 package com.example.mydiary.pagemanager;
 
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -27,8 +28,7 @@ public class DiaryRecyclerViewAdapter extends RecyclerView.Adapter<DiaryRecycler
     @NonNull
     @Override
     public DiaryRecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = View.inflate(parent.getContext(), DiaryRecyclerViewHolder.LAYOUT, null);
-
+        View view = LayoutInflater.from(parent.getContext()).inflate(DiaryRecyclerViewHolder.LAYOUT, null);
         return new DiaryRecyclerViewHolder(view);
     }
 
