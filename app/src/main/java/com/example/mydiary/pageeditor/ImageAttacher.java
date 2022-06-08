@@ -1,4 +1,4 @@
-package com.example.mydiary.entryeditor;
+package com.example.mydiary.pageeditor;
 
 import android.text.Editable;
 import android.text.Spanned;

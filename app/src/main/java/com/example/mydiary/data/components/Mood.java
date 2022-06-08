@@ -1,4 +1,4 @@
-package com.example.mydiary.data;
+package com.example.mydiary.data.components;
 
 import androidx.annotation.NonNull;
 

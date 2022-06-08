@@ -1,4 +1,4 @@
-package com.example.mydiary.entryeditor;
+package com.example.mydiary.pageeditor;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,24 +8,25 @@ import android.view.MenuItem;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.mydiary.R;
-import com.example.mydiary.data.Diary;
+import com.example.mydiary.data.diary.Diary;
+import com.example.mydiary.data.diary.EditPage;
 import com.example.mydiary.dialog.InputDialog;
 import com.example.mydiary.dialog.InputDialogBuilder;
 import com.example.mydiary.register.Registry;
 
-public class EntryEditorActivity extends AppCompatActivity {
+public class PageEditorActivity extends AppCompatActivity {
 
     final InputDialogBuilder inputStringDialogBuilder = new InputDialogBuilder(this, InputDialog.STRING);
 
     EditImageText eit;
     String pageId;
     Diary diary;
-    Diary.EditPage page;
+    EditPage page;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_entry_editor);
+        setContentView(R.layout.activity_page_editor);
         pageId = getIntent().getStringExtra("id");
         try {
             diary = new Diary(this, Registry.DEFAULT, "diary");

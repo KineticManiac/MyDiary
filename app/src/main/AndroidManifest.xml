@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyDiary">
         <activity
-            android:name=".entrymanager.EntryManagerActivity"
+            android:name=".pagemanager.PageManagerActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -19,12 +19,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".entryeditor.EntryEditorActivity"
+            android:name=".pageeditor.PageEditorActivity"
             android:exported="true">
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".entrymanager.EntryManagerActivity"/>
+                android:value=".pagemanager.PageManagerActivity"/>
 
         </activity>
     </application>

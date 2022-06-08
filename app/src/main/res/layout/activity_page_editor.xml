@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".entryeditor.EntryEditorActivity">
+    tools:context=".pageeditor.PageEditorActivity">
 
-    <com.example.mydiary.entryeditor.EditImageText
+    <com.example.mydiary.pageeditor.EditImageText
         android:id="@+id/editImageText"
         android:layout_width="0dp"
         android:layout_height="0dp"

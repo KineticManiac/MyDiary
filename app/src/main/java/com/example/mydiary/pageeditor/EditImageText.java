@@ -1,4 +1,4 @@
-package com.example.mydiary.entryeditor;
+package com.example.mydiary.pageeditor;
 
 import android.content.ClipDescription;
 import android.content.Context;

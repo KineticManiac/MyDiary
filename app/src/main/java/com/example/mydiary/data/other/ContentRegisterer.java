@@ -1,4 +1,4 @@
-package com.example.mydiary.data;
+package com.example.mydiary.data.other;
 
 import android.content.Context;
 import android.graphics.Bitmap;
