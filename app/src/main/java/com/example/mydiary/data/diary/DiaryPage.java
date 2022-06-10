@@ -13,6 +13,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -20,6 +21,7 @@ import java.util.Iterator;
 class DiaryPage implements Serializable, ModifiablePage {
     private transient Diary diary;
     private final String pageId;
+    private Date date;
     private String title;
     private Mood mood;
 
@@ -36,7 +38,9 @@ class DiaryPage implements Serializable, ModifiablePage {
         String pageTitle = page.getTitle();
         if (title == null || !title.equals(pageTitle))
             title = pageTitle;
-        setMood(page.getMood());
+
+        date = page.getDate();
+        mood = page.getMood();
         setContent(page.getContent());
     }
 
@@ -46,6 +50,11 @@ class DiaryPage implements Serializable, ModifiablePage {
 
     public Mood getMood() {
         return mood;
+    }
+
+    @Override
+    public Date getDate() {
+        return date;
     }
 
     String getId() {
@@ -64,6 +73,11 @@ class DiaryPage implements Serializable, ModifiablePage {
 
     public void setMood(Mood mood) {
         this.mood = mood;
+    }
+
+    @Override
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     public void setContent(Spanned content) throws IOException {

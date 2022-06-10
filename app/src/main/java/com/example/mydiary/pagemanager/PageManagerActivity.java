@@ -8,11 +8,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mydiary.R;
+import com.example.mydiary.data.components.Mood;
 import com.example.mydiary.data.diary.Diary;
+import com.example.mydiary.data.diary.OpenPage;
 import com.example.mydiary.register.Registry;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 
 public class PageManagerActivity extends AppCompatActivity {
 
@@ -33,8 +37,19 @@ public class PageManagerActivity extends AppCompatActivity {
         try {
             diary = new Diary(this, Registry.DEFAULT);
 
-            for(int i = 0; i < 100; i++)
-                diary.createPage().close();
+            Mood mood = Mood.DEFAULT;
+            Date date = new Date();
+            for(int i = 0; i < 100; i++) {
+                OpenPage page = diary.createPage();
+
+                page.setMood(mood);
+                mood = mood.getNext();
+
+                page.setDate(date);
+                date = new Date(date.getTime() + 24 * 60 * 60 * 1000);
+
+                page.close();
+            }
         }
         catch (IOException e){
             Snackbar.make(coordinatorLayout,"Error: Can't load diary.", Snackbar.LENGTH_LONG).show();

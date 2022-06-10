@@ -12,17 +12,20 @@ import com.example.mydiary.data.diary.Page;
 import com.example.mydiary.data.diary.ViewPage;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
-public class DiaryRecyclerViewAdapter extends RecyclerView.Adapter<DiaryRecyclerViewHolder> {
+class DiaryRecyclerViewAdapter extends RecyclerView.Adapter<DiaryRecyclerViewHolder> {
     private final ArrayList<Page> pages;
 
-    public DiaryRecyclerViewAdapter(Diary diary){
+    DiaryRecyclerViewAdapter(Diary diary){
         super();
 
         pages = new ArrayList<>();
         for(ViewPage page: diary){
             pages.add(page);
         }
+
+        pages.sort(Comparator.comparing(Page::getDate));
     }
 
     @NonNull

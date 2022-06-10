@@ -7,9 +7,11 @@
         <entry key="..\:/Users/azahi/AndroidStudioProjects/MyDiary/app/src/main/res/drawable/ic_launcher_background.xml" value="0.145" />
         <entry key="..\:/Users/azahi/AndroidStudioProjects/MyDiary/app/src/main/res/layout/activity_entry_manager.xml" value="0.1" />
         <entry key="..\:/Users/azahi/AndroidStudioProjects/MyDiary/app/src/main/res/layout/activity_main.xml" value="0.24547101449275363" />
+        <entry key="..\:/Users/azahi/AndroidStudioProjects/MyDiary/app/src/main/res/layout/activity_page_editor.xml" value="0.15" />
         <entry key="..\:/Users/azahi/AndroidStudioProjects/MyDiary/app/src/main/res/layout/activity_page_manager.xml" value="0.2" />
-        <entry key="..\:/Users/azahi/AndroidStudioProjects/MyDiary/app/src/main/res/layout/card_diary_page.xml" value="0.2" />
+        <entry key="..\:/Users/azahi/AndroidStudioProjects/MyDiary/app/src/main/res/layout/card_diary_page.xml" value="0.29347826086956524" />
         <entry key="..\:/Users/azahi/AndroidStudioProjects/MyDiary/app/src/main/res/layout/sample_diary_card_view.xml" value="0.13703703703703704" />
+        <entry key="..\:/Users/azahi/AndroidStudioProjects/MyDiary/app/src/main/res/menu/diary_entry_menu.xml" value="0.15" />
       </map>
     </option>
   </component>

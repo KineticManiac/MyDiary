@@ -5,6 +5,7 @@ import android.text.Spanned;
 import com.example.mydiary.data.components.Mood;
 
 import java.io.IOException;
+import java.util.Date;
 
 //Diary'deki DiaryPage'leri izlemek için
 public class ViewPage implements Page {
@@ -24,6 +25,11 @@ public class ViewPage implements Page {
 
     public Mood getMood() {
         return page.getMood();
+    }
+
+    @Override
+    public Date getDate() {
+        return page.getDate();
     }
 
     public Spanned getContent() throws IOException {

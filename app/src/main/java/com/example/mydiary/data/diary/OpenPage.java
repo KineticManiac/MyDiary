@@ -5,6 +5,7 @@ import android.text.Spanned;
 import com.example.mydiary.data.components.Mood;
 
 import java.io.IOException;
+import java.util.Date;
 
 //Page düzenlemek için (bitirdikten sonra kapatmak gerekir)
 public class OpenPage implements ModifiablePage {
@@ -29,6 +30,11 @@ public class OpenPage implements ModifiablePage {
     }
 
     @Override
+    public Date getDate() {
+        return page.getDate();
+    }
+
+    @Override
     public Spanned getContent() {
         return page.getContent();
     }
@@ -41,6 +47,11 @@ public class OpenPage implements ModifiablePage {
     @Override
     public void setMood(Mood mood) {
         page.setMood(mood);
+    }
+
+    @Override
+    public void setDate(Date date) {
+        page.setDate(date);
     }
 
     @Override

@@ -5,6 +5,8 @@ import android.text.SpannedString;
 
 import com.example.mydiary.data.components.Mood;
 
+import java.util.Date;
+
 //Immutable empty page. Bundan EditPage oluşturulabilir.
 class EmptyPage implements Page {
     static final String DEFAULT_EMPTY_PAGE_TITLE = "My Diary Page";
@@ -15,7 +17,7 @@ class EmptyPage implements Page {
 
     EmptyPage(Diary diary) {
         this.diary = diary;
-        int i = 0;
+        int i = 1;
         String title = generateTitle(i);
         while (diary.diaryPageSet.hasTitle(title)) {
             i++;
@@ -25,7 +27,7 @@ class EmptyPage implements Page {
     }
 
     private String generateTitle(int i) {
-        if (i == 0) {
+        if (i == 1) {
             return DEFAULT_EMPTY_PAGE_TITLE;
         } else {
             return DEFAULT_EMPTY_PAGE_TITLE + " " + i;
@@ -40,6 +42,11 @@ class EmptyPage implements Page {
     @Override
     public Mood getMood() {
         return Mood.DEFAULT;
+    }
+
+    @Override
+    public Date getDate() {
+        return new Date();
     }
 
     @Override
