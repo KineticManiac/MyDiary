@@ -7,6 +7,28 @@ public abstract class DiaryPage implements Page, Serializable {
     protected DiaryPage(String pageId){
         this.pageId = pageId;
     }
+
+    abstract String getPassword();
+    abstract void setPassword(String password);
+    public boolean hasPassword(){
+        return getPassword() != null;
+    }
+    public boolean tryPassword(String attempt){
+        String password = getPassword();
+        return password != null ? password.equals(attempt) : true;
+    }
+    public void tryWithPassword(String attempt, PasswordCallback passwordCallback){
+        if(tryPassword(attempt))
+            passwordCallback.onSuccess(this);
+        else
+            passwordCallback.onFail(this);
+    }
+    public boolean changePassword(String curPassword, String newPassword){
+        boolean result = tryPassword(curPassword);
+        if(result)
+            setPassword(newPassword);
+        return result;
+    }
     public String getId(){
         return pageId;
     }
@@ -20,5 +42,9 @@ public abstract class DiaryPage implements Page, Serializable {
         else{
             return false;
         }
+    }
+    public interface PasswordCallback{
+        void onSuccess(DiaryPage diaryPage);
+        void onFail(DiaryPage diaryPage);
     }
 }

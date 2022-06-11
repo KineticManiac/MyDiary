@@ -19,7 +19,7 @@ public class InputDialogBuilder {
 
     private CallbackListener positiveListener, negativeListener, neutralListener;
     private String title, positiveText, negativeText, neutralText;
-
+    
     public InputDialogBuilder(Activity activity, InputDialog inputDialog){
         this.activity = activity;
         this.inputDialog = inputDialog;

@@ -11,5 +11,11 @@
     <item android:id="@+id/action_title"
         android:title="@string/action_title_text"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_password"
+        android:title="Set/Change Password" />
+    <item
+        android:id="@+id/action_remove_password"
+        android:title="Remove Password" />
 
 </menu>

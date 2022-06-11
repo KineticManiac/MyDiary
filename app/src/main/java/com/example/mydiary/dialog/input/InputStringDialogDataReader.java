@@ -12,7 +12,7 @@ public class InputStringDialogDataReader implements InputDialog.DataReader{
 
     @Override
     public Object getData(View view) {
-        EditText editText = view.findViewById(R.id.dialogInputEditText);
+        EditText editText = view.findViewById(R.id.inputStringEditText);
         return editText.getText().toString();
     }
 }

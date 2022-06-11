@@ -6,7 +6,8 @@ import android.view.View;
 import com.example.mydiary.R;
 
 public enum InputDialog {
-    STRING(R.layout.dialog_input_string, InputStringDialogDataReader.SINGLETON);
+    STRING(R.layout.dialog_input_string, InputStringDialogDataReader.SINGLETON),
+    PASSWORD(R.layout.dialog_input_password, InputPasswordDialogDataReader.SINGLETON);
 
     private final int layoutId;
     private final DataReader dataReader;

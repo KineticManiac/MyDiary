@@ -145,5 +145,7 @@ public class ContentRegisterer {
                 registry.removeRegister(rName);
             }
         }
+
+        registry.removeRegister(getTextRegister(contentName));
     }
 }

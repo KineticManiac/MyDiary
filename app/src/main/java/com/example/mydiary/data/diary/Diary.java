@@ -82,9 +82,9 @@ public class Diary implements Iterable<ViewPage> {
         }
     }
 
-    public void storePage(String pageId, Page page) throws IOException{
+    public void storePage(String pageId, Page page, String password) throws IOException{
         assert active;
-        internalPageSet.put(pageId, page);
+        internalPageSet.put(pageId, page, password);
         internalPageSetRegisterer.storeSet(registerName, internalPageSet);
     }
 
@@ -114,6 +114,7 @@ public class Diary implements Iterable<ViewPage> {
 
     public void remove(DiaryPage page) throws IOException{
         internalPageSet.remove(page.pageId);
+        internalPageSetRegisterer.storeSet(registerName, internalPageSet);
     }
 
     @NonNull

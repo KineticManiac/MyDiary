@@ -15,6 +15,8 @@ import com.example.mydiary.data.components.Mood;
 import com.example.mydiary.data.diary.Diary;
 import com.example.mydiary.data.diary.DiaryPage;
 import com.example.mydiary.data.diary.OpenPage;
+import com.example.mydiary.dialog.input.InputDialog;
+import com.example.mydiary.dialog.input.InputDialogBuilder;
 import com.example.mydiary.pageeditor.PageEditorActivity;
 import com.example.mydiary.register.FileRegistry;
 import com.example.mydiary.register.Registry;
@@ -53,15 +55,6 @@ public class PageManagerActivity extends AppCompatActivity {
         if (!openDiary())
             return;
 
-        /*
-        try{
-            initialize();
-        }
-        catch(IOException e){
-            throw new RuntimeException(e);
-        }
-         */
-
         recyclerViewAdapter = new DiaryRecyclerViewAdapter(diary);
         setRemoving(false);
         recyclerView.setAdapter(recyclerViewAdapter);
@@ -83,22 +76,6 @@ public class PageManagerActivity extends AppCompatActivity {
             Snackbar.make(snackbarAttacher,"Error: Can't load diary.", Snackbar.LENGTH_INDEFINITE).show();
             e.printStackTrace();
             return false;
-        }
-    }
-
-    void initialize() throws IOException{
-        Mood mood = Mood.DEFAULT;
-        Date date = new Date();
-        for(int i = 0; i < 100; i++) {
-            OpenPage page = diary.createPage();
-
-            page.setMood(mood);
-            mood = mood.getNext();
-
-            page.setDate(date);
-            date = new Date(date.getTime() + 24 * 60 * 60 * 1000);
-
-            page.close();
         }
     }
 
@@ -138,6 +115,32 @@ public class PageManagerActivity extends AppCompatActivity {
     }
 
     private void onEditPage(DiaryPage page){
+        if(page.hasPassword()){
+            new InputDialogBuilder(this, InputDialog.PASSWORD)
+                    .setTitle("Enter Password: ")
+                    .setPositiveButton(data -> page.tryWithPassword((String) data, new DiaryPage.PasswordCallback() {
+                        @Override
+                        public void onSuccess(DiaryPage diaryPage) {
+                            startEditingPage(diaryPage);
+                        }
+
+                        @Override
+                        public void onFail(DiaryPage diaryPage) {
+                            new AlertDialog.Builder(PageManagerActivity.this)
+                                    .setPositiveButton("OK", ((dialogInterface, i) -> onEditPage(diaryPage)))
+                                    .setMessage("Incorrect password.")
+                                    .show();
+                        }
+                    }))
+                    .setNegativeButton(null)
+                    .create().show();
+        }
+        else{
+            startEditingPage(page);
+        }
+    }
+
+    private void startEditingPage(DiaryPage page){
         Intent intent = new Intent(this, PageEditorActivity.class);
         intent.putExtra("id", page.getId());
         diary.close();
@@ -148,6 +151,7 @@ public class PageManagerActivity extends AppCompatActivity {
     public boolean onPrepareOptionsMenu(Menu menu){
         super.onPrepareOptionsMenu(menu);
 
+        menu.clear();
         if(removing) {
             getMenuInflater().inflate(R.menu.page_manager_menu, menu);
             menu.findItem(R.id.manager_menu_cancel).setOnMenuItemClickListener(item -> {
@@ -215,6 +219,7 @@ public class PageManagerActivity extends AppCompatActivity {
                     recyclerViewAdapter.add(diary.viewPageById(id));
                     break;
             }
+            Snackbar.make(snackbarAttacher, "Page saved.", Snackbar.LENGTH_SHORT).show();
         }
     }
 }

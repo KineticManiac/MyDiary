@@ -32,4 +32,14 @@ public class ViewPage extends DiaryPage {
     public Spanned getContent() throws IOException {
         return page.getContent();
     }
+
+    @Override
+    String getPassword() {
+        return page.getPassword();
+    }
+
+    @Override
+    void setPassword(String password) {
+        page.setPassword(password);
+    }
 }

@@ -23,6 +23,9 @@ class InternalPage extends ModifiableDiaryPage implements Serializable {
     private Date date;
     private String title;
     private Mood mood;
+    private String password;
+
+
 
     InternalPage(Diary diary, String pageId, Page page) throws IOException {
         super(pageId);
@@ -54,6 +57,16 @@ class InternalPage extends ModifiableDiaryPage implements Serializable {
     @Override
     public Date getDate() {
         return date;
+    }
+
+    @Override
+    String getPassword() {
+        return password;
+    }
+
+    @Override
+    void setPassword(String password) {
+        this.password = password;
     }
 
     public String getId() {
@@ -93,10 +106,11 @@ class InternalPage extends ModifiableDiaryPage implements Serializable {
         final HashMap<String, InternalPage> idMap;
         final HashMap<String, InternalPage> titleMap;
 
-        void put(String pageId, Page source) throws IOException{
+        void put(String pageId, Page source, String password) throws IOException{
             String title = source.getTitle();
             InternalPage destination = getById(pageId);
             if(destination != null){
+                destination.setPassword(password);
                 if(!title.equals(destination.title)){
                     titleMap.remove(destination.title);
                     titleMap.put(title, destination);
@@ -105,12 +119,13 @@ class InternalPage extends ModifiableDiaryPage implements Serializable {
             }
             else{
                 destination = new InternalPage(diary, pageId, source);
+                destination.setPassword(password);
                 idMap.put(pageId, destination);
                 titleMap.put(title, destination);
             }
         }
 
-        void remove(InternalPage page) throws IOException{
+        private void remove(InternalPage page) throws IOException{
             assert idMap.containsValue(page);
             assert titleMap.containsValue(page);
 

@@ -12,12 +12,23 @@ public class OpenPage extends ModifiableDiaryPage {
     private final Diary diary;
     private final EditPage page;
     private final String pageId;
+    private String password;
 
     OpenPage(Diary diary, String pageId, EditPage page) {
         super(pageId);
         this.diary = diary;
         this.pageId = pageId;
         this.page = page;
+    }
+
+    @Override
+    protected String getPassword() {
+        return password;
+    }
+
+    @Override
+    protected void setPassword(String password) {
+        this.password = password;
     }
 
     @Override
@@ -66,7 +77,7 @@ public class OpenPage extends ModifiableDiaryPage {
     }
 
     public void close() throws IOException {
-        diary.storePage(pageId, page);
+        diary.storePage(pageId, page, password);
     }
 
     @Override
