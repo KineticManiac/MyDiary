@@ -8,15 +8,21 @@ import java.io.IOException;
 import java.util.Date;
 
 //Page düzenlemek için (bitirdikten sonra kapatmak gerekir)
-public class OpenPage implements ModifiablePage {
+public class OpenPage extends ModifiableDiaryPage {
     private final Diary diary;
     private final EditPage page;
     private final String pageId;
 
     OpenPage(Diary diary, String pageId, EditPage page) {
+        super(pageId);
         this.diary = diary;
         this.pageId = pageId;
         this.page = page;
+    }
+
+    @Override
+    public String getId(){
+        return pageId;
     }
 
     @Override

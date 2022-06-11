@@ -41,7 +41,7 @@ public class EditPage implements ModifiablePage {
     }
 
     public void setTitle(String title) throws TitleAlreadyExistsException {
-        if (diary.diaryPageSet.hasTitle(title))
+        if (diary.internalPageSet.hasTitle(title))
             throw new TitleAlreadyExistsException("Title " + title + " already exists.");
         this.title = title;
     }

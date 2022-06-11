@@ -8,15 +8,12 @@ import java.io.IOException;
 import java.util.Date;
 
 //Diary'deki DiaryPage'leri izlemek için
-public class ViewPage implements Page {
-    private final DiaryPage page;
+public class ViewPage extends DiaryPage {
+    private final InternalPage page;
 
-    ViewPage(DiaryPage page) {
+    ViewPage(InternalPage page) {
+        super(page.pageId);
         this.page = page;
-    }
-
-    public String getId() {
-        return page.getId();
     }
 
     public String getTitle() {

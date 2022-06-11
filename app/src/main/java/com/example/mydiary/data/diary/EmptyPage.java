@@ -19,7 +19,7 @@ class EmptyPage implements Page {
         this.diary = diary;
         int i = 1;
         String title = generateTitle(i);
-        while (diary.diaryPageSet.hasTitle(title)) {
+        while (diary.internalPageSet.hasTitle(title)) {
             i++;
             title = generateTitle(i);
         }

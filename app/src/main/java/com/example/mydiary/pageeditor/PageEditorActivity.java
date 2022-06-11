@@ -14,6 +14,8 @@ import com.example.mydiary.dialog.InputDialog;
 import com.example.mydiary.dialog.InputDialogBuilder;
 import com.example.mydiary.register.Registry;
 
+import java.util.Date;
+
 public class PageEditorActivity extends AppCompatActivity {
 
     final InputDialogBuilder inputStringDialogBuilder = new InputDialogBuilder(this, InputDialog.STRING);
@@ -30,6 +32,7 @@ public class PageEditorActivity extends AppCompatActivity {
         pageId = getIntent().getStringExtra("id");
         try {
             diary = new Diary(this, Registry.DEFAULT, "diary");
+            diary.open();
             page = pageId != null ? diary.editPageById(pageId) : diary.editEmptyPage();
         }
         catch (Exception e){
@@ -45,6 +48,8 @@ public class PageEditorActivity extends AppCompatActivity {
     @Override
     public void onBackPressed(){
         page.setContent(eit.getText());
+        page.setDate(new Date());
+
         if(pageId == null){
             pageId = diary.createPageId();
         }
@@ -55,6 +60,8 @@ public class PageEditorActivity extends AppCompatActivity {
         {
             throw new RuntimeException(e);
         }
+        diary.close();
+
         Intent result = new Intent();
         result.putExtra("id", pageId);
         setResult(RESULT_OK, result);
