@@ -12,6 +12,7 @@
         android:id="@+id/card_page_card"
         android:layout_width="match_parent"
         android:layout_height="85dp"
+        app:cardBackgroundColor="@android:color/background_light"
         app:cardCornerRadius="15dp"
         app:strokeColor="@color/material_on_surface_stroke"
         app:strokeWidth="3dp">

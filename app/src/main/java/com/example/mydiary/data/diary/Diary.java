@@ -112,6 +112,10 @@ public class Diary implements Iterable<ViewPage> {
         return openPage(viewPageByTitle(title));
     }
 
+    public void remove(DiaryPage page) throws IOException{
+        internalPageSet.remove(page.pageId);
+    }
+
     @NonNull
     @Override
     public Iterator<ViewPage> iterator() {

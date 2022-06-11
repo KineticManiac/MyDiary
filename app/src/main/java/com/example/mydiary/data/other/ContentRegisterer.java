@@ -130,4 +130,20 @@ public class ContentRegisterer {
         os.write(bytes);
         os.close();
     }
+
+    public void remove(String contentName) throws IOException{
+        String text = new String(
+                registry.getInputStream(getTextRegister(contentName)).readAll(),
+                StandardCharsets.UTF_8
+        );
+
+        Matcher matcher = Pattern.compile("<\\w>").matcher(text);
+        while(matcher.find()){
+            String str = matcher.group();
+            if(!str.equals("<lt>") && !str.equals("<gt>")){
+                String rName = contentName + "." + str.substring(1, str.length() - 1);
+                registry.removeRegister(rName);
+            }
+        }
+    }
 }

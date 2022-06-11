@@ -68,4 +68,9 @@ public class OpenPage extends ModifiableDiaryPage {
     public void close() throws IOException {
         diary.storePage(pageId, page);
     }
+
+    @Override
+    public void remove() throws IOException {
+        diary.remove(this);
+    }
 }

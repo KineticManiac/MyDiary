@@ -7,18 +7,19 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.mydiary.data.diary.DiaryPage;
 import com.example.mydiary.data.diary.Diary;
+import com.example.mydiary.data.diary.DiaryPage;
 import com.example.mydiary.data.diary.Page;
 import com.example.mydiary.data.diary.ViewPage;
 
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.List;
 
 class DiaryRecyclerViewAdapter extends RecyclerView.Adapter<DiaryRecyclerViewHolder> {
     private final Diary diary;
     private ArrayList<DiaryPage> pages;
     private OnClickListener onClickListener;
+    private OnLongClickListener onLongClickListener;
 
     DiaryRecyclerViewAdapter(Diary diary){
         super();
@@ -61,8 +62,30 @@ class DiaryRecyclerViewAdapter extends RecyclerView.Adapter<DiaryRecyclerViewHol
         }
     }
 
+    void remove(DiaryPage page){
+        int index = pages.indexOf(page);
+        notifyItemRemoved(index);
+        pages.remove(index);
+    }
+
+    void add(DiaryPage page){
+        int index = 0;
+        while(index < pages.size() && page.compareTo(pages.get(index)) > 0)
+            index++;
+        pages.add(index, page);
+        notifyItemInserted(index);
+    }
+
     void setOnClickListener(OnClickListener onClickListener) {
         this.onClickListener = onClickListener;
+    }
+
+    void setOnLongClickListener(OnLongClickListener onLongClickListener) {
+        this.onLongClickListener = onLongClickListener;
+    }
+
+    public void setDiaryPageSelected(DiaryPage page, boolean selected){
+        notifyItemChanged(pages.indexOf(page), selected);
     }
 
     @NonNull
@@ -73,9 +96,30 @@ class DiaryRecyclerViewAdapter extends RecyclerView.Adapter<DiaryRecyclerViewHol
     }
 
     @Override
+    public void onBindViewHolder(@NonNull DiaryRecyclerViewHolder holder, int position, List<Object> payloads){
+        if(payloads.size() == 1){
+            Object payload = payloads.get(0);
+            if(payload instanceof Boolean){
+                boolean selected = (Boolean) payload;
+                holder.setSelected(selected);
+                return;
+            }
+        }
+        super.onBindViewHolder(holder, position, payloads);
+    }
+
+    @Override
     public void onBindViewHolder(@NonNull DiaryRecyclerViewHolder holder, int position) {
         holder.loadPage(pages.get(position));
-        holder.setOnClickListener(viewHolder -> onClick(viewHolder));
+        holder.setOnClickListener(this::onClick);
+        holder.setOnLongClickListener(this::onLongClick);
+    }
+
+    private boolean onLongClick(DiaryRecyclerViewHolder viewHolder) {
+        if(onLongClickListener != null)
+            return onLongClickListener.onLongClick(viewHolder.getPage());
+        else
+            return false;
     }
 
     private void onClick(DiaryRecyclerViewHolder viewHolder){
@@ -90,5 +134,9 @@ class DiaryRecyclerViewAdapter extends RecyclerView.Adapter<DiaryRecyclerViewHol
 
     interface OnClickListener{
         void onClick(DiaryPage page);
+    }
+
+    interface OnLongClickListener{
+        boolean onLongClick(DiaryPage page);
     }
 }

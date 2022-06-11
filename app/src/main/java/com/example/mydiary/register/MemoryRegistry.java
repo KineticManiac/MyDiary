@@ -19,7 +19,7 @@ public class MemoryRegistry implements Registry {
 
     @Override
     public SizedInputStream getInputStream(String register) {
-        final byte[] buffer = map.getOrDefault(register, null);
+        final byte[] buffer = map.get(register);
         if(buffer != null){
             final ByteArrayInputStream bais = new ByteArrayInputStream(buffer);
             return new SizedInputStream() {
@@ -56,5 +56,10 @@ public class MemoryRegistry implements Registry {
                 map.put(register, buffer);
             }
         };
+    }
+
+    @Override
+    public void removeRegister(String register) {
+        map.put(register, null);
     }
 }

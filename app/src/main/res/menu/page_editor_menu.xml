@@ -12,12 +12,4 @@
         android:title="@string/action_title_text"
         app:showAsAction="never"/>
 
-    <item android:id="@+id/action_location"
-        android:title="@string/action_location_set_text"
-        app:showAsAction="never"/>
-
-    <item android:id="@+id/action_date"
-        android:title="@string/action_date_set_text"
-        app:showAsAction="never"/>
-
 </menu>

@@ -1,4 +1,4 @@
-package com.example.mydiary.dialog;
+package com.example.mydiary.dialog.input;
 
 import android.view.LayoutInflater;
 import android.view.View;

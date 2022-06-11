@@ -83,6 +83,11 @@ class InternalPage extends ModifiableDiaryPage implements Serializable {
         diary.contentRegisterer.store(pageId, content);
     }
 
+    @Override
+    public void remove() throws IOException{
+        diary.remove(this);
+    }
+
     static class Set implements Iterable<InternalPage>{
         final Diary diary;
         final HashMap<String, InternalPage> idMap;
@@ -103,6 +108,21 @@ class InternalPage extends ModifiableDiaryPage implements Serializable {
                 idMap.put(pageId, destination);
                 titleMap.put(title, destination);
             }
+        }
+
+        void remove(InternalPage page) throws IOException{
+            assert idMap.containsValue(page);
+            assert titleMap.containsValue(page);
+
+            idMap.remove(page);
+            titleMap.remove(page);
+            diary.contentRegisterer.remove(page.pageId);
+        }
+
+        void remove(String pageId) throws IOException{
+            InternalPage page = getById(pageId);
+            if(page != null)
+                remove(page);
         }
 
         InternalPage getById(String pageId){
